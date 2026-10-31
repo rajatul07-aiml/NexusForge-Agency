@@ -1,6 +1,0 @@
-{
-  "name": "NexusForge - WhatsApp AI Auto-Receptionist for Dental Clinics",
-  "description": "Stop losing patients after hours. NexusForge captures patient leads and books appointments directly on WhatsApp 24/7 for Indian dental clinics and hospitals.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
