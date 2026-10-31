@@ -23,7 +23,7 @@ export default function ComingSoon() {
     <div className="page">
       <header className="top">
         <Image
-          src="/logo.heif"
+          src="/logo.jpeg"
           alt="Nexus Forge logo"
           width={3368}
           height={3368}
