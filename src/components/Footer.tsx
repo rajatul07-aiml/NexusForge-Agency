@@ -7,14 +7,12 @@ import React from 'react';
 
 interface FooterProps {
   onOpenBooking: () => void;
-  onOpenCopyVault: () => void;
   showServingBadge?: boolean;
   onToggleServingBadge?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ 
   onOpenBooking, 
-  onOpenCopyVault,
   showServingBadge,
   onToggleServingBadge
 }) => {
@@ -39,16 +37,11 @@ export const Footer: React.FC<FooterProps> = ({
 
           <div className="flex flex-wrap items-center gap-5 text-slate-300 font-medium">
             <a href="#the-problem" className="hover:text-white transition-colors">The Problem</a>
+            <a href="#demo-simulator" className="hover:text-white transition-colors">Live Demo</a>
             <a href="#the-solution" className="hover:text-white transition-colors">The Solution</a>
             <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
             <a href="#calculator" className="hover:text-white transition-colors">Calculator</a>
             <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
-            <button
-              onClick={onOpenCopyVault}
-              className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors"
-            >
-              Raw Copy
-            </button>
             {onToggleServingBadge && (
               <button
                 onClick={onToggleServingBadge}

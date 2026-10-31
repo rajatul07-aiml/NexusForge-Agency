@@ -19,11 +19,9 @@ import { PatientSuccessStories } from './components/PatientSuccessStories';
 import { CallToAction } from './components/CallToAction';
 import { FAQ } from './components/FAQ';
 import { FloatingWhatsAppCTA } from './components/FloatingWhatsAppCTA';
-import { CopyVaultModal } from './components/CopyVaultModal';
 import { Footer } from './components/Footer';
 
 export default function App() {
-  const [isCopyVaultOpen, setIsCopyVaultOpen] = useState(false);
   // Feature flag: toggle "Currently Serving 50+ Clinics" social proof badge in Hero
   const [showServingBadge, setShowServingBadge] = useState<boolean>(true);
   const [showScrollTop, setShowScrollTop] = useState<boolean>(false);
@@ -60,7 +58,6 @@ export default function App() {
       {/* Top Bar Contract */}
       <Navbar
         onOpenBooking={scrollToBooking}
-        onOpenCopyVault={() => setIsCopyVaultOpen(true)}
       />
 
       {/* Main Landing Page Experience */}
@@ -117,7 +114,6 @@ export default function App() {
       {/* Footer */}
       <Footer
         onOpenBooking={scrollToBooking}
-        onOpenCopyVault={() => setIsCopyVaultOpen(true)}
         showServingBadge={showServingBadge}
         onToggleServingBadge={() => setShowServingBadge((prev) => !prev)}
       />
@@ -135,12 +131,6 @@ export default function App() {
 
       {/* Floating WhatsApp Action Button with Quick Demo Popover */}
       <FloatingWhatsAppCTA onOpenBooking={scrollToBooking} />
-
-      {/* Copy Vault Modal for instant copy-paste */}
-      <CopyVaultModal
-        isOpen={isCopyVaultOpen}
-        onClose={() => setIsCopyVaultOpen(false)}
-      />
     </div>
   );
 }
