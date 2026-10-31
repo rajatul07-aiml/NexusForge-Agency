@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { CheckCircle2, Zap, Clock, ShieldCheck, HeartHandshake } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import { COPY_DATA } from '../copyData';
 
 interface TheSolutionProps {

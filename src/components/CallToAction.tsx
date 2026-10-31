@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { PhoneCall, Calendar, Clock, CheckCircle2, ShieldCheck, ArrowRight, MessageSquare } from 'lucide-react';
+import { CheckCircle2, ArrowRight, MessageSquare } from 'lucide-react';
 import { COPY_DATA } from '../copyData';
 import { DemoBookingForm } from '../types';
 

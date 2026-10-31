@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, MapPin, CheckCircle2, TrendingUp, IndianRupee } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, CheckCircle2 } from 'lucide-react';
 
 interface SuccessStory {
   id: string;

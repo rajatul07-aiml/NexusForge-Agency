@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { IndianRupee, Calculator, ArrowRight, TrendingUp } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface LeakageCalculatorProps {
   onBookCall: () => void;

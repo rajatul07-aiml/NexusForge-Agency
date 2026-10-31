@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Check, CheckCheck, RefreshCw, Sparkles, Table, Phone, Shield, ArrowDown, Download, FileSpreadsheet } from 'lucide-react';
+import { Send, CheckCheck, RefreshCw, Table, Phone, Download } from 'lucide-react';
 import { ChatMessage, SheetLead } from '../types';
 
 const INITIAL_SHEET_DATA: SheetLead[] = [

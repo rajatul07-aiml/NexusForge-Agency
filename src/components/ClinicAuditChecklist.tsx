@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { AlertTriangle, CheckCircle2, XCircle, ArrowRight, ClipboardCheck } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ArrowRight, ClipboardCheck } from 'lucide-react';
 
 interface ClinicAuditChecklistProps {
   onBookCall: () => void;

@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Quote, CheckCircle2, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 
 export const ClinicProof: React.FC = () => {
   const testimonials = [

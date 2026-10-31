@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { AlertCircle, Moon, PhoneOff, FileSpreadsheet, XCircle, ArrowRight } from 'lucide-react';
+import { AlertCircle, Moon, PhoneOff, FileSpreadsheet, XCircle } from 'lucide-react';
 import { COPY_DATA } from '../copyData';
 
 export const TheProblem: React.FC = () => {

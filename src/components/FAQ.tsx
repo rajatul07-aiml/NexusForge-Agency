@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { ChevronDown, ShieldCheck, Clock, Layers, HelpCircle, PhoneCall } from 'lucide-react';
+import { ChevronDown, PhoneCall } from 'lucide-react';
 
 interface FAQProps {
   onBookCall?: () => void;

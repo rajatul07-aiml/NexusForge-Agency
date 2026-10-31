@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { MessageSquare, X, Send, CheckCircle2, PhoneCall, Sparkles } from 'lucide-react';
+import { MessageSquare, X, Send, CheckCircle2 } from 'lucide-react';
 
 interface FloatingWhatsAppCTAProps {
   onOpenBooking: () => void;
@@ -27,7 +27,7 @@ export const FloatingWhatsAppCTA: React.FC<FloatingWhatsAppCTAProps> = ({ onOpen
       {/* Popover Window */}
       {isOpen && (
         <div 
-          className="mb-3 w-[310px] sm:w-[350px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200"
+          className="mb-3 w-[310px] sm:w-[350px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden transition-all duration-200"
           role="dialog"
           aria-label="WhatsApp Quick Connect"
         >

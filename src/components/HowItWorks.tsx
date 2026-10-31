@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { MousePointerClick, MessageSquare, CalendarCheck2, ArrowRight } from 'lucide-react';
+import { MousePointerClick, MessageSquare, CalendarCheck2 } from 'lucide-react';
 import { COPY_DATA } from '../copyData';
 
 interface HowItWorksProps {

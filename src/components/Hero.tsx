@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { ArrowRight, CheckCircle2, MessageCircle, Clock, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, MessageCircle, Clock } from 'lucide-react';
 import { COPY_DATA } from '../copyData';
 
 interface HeroProps {
