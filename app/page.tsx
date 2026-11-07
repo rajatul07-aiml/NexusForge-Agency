@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 // Change this to your real contact email.
-const CONTACT_EMAIL = "contact@nexusforge.com";
+const CONTACT_EMAIL = "contact@nexusforge.in";
 
 const services = [
   {
