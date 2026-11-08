@@ -3,11 +3,13 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {
   scroll-behavior: smooth;
   color-scheme: light dark;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -19,6 +21,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  width: 100%;
+}
+
+/* Ensure inputs don't auto-zoom on iOS */
+input, select, textarea {
+  font-size: 16px;
 }
 
 /* Thin scrollbar */
@@ -37,4 +45,55 @@ body {
 ::selection {
   background-color: #6366f130;
   color: #a5b4fc;
+}
+
+/* ─── Responsive Display Utilities ─── */
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+  .mobile-only {
+    display: flex !important;
+  }
+  .process-row-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    padding: 20px 14px !important;
+  }
+  .process-inner-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  .hero-buttons-container {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+  .hero-btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  .cta-buttons-container {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+  .cta-btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  .footer-social-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+  .footer-bottom-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-only {
+    display: none !important;
+  }
 }

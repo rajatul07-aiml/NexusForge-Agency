@@ -1,8 +1,9 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useState, useRef, createContext, useContext, useCallback, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 /* ─────────────────────────────────────────────────────────────
    Theme Tokens
@@ -180,6 +181,7 @@ function Navbar() {
   const { tk } = useTheme();
   const links = ["Services", "Work", "About", "Contact"];
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -202,22 +204,26 @@ function Navbar() {
         left: 0,
         right: 0,
         zIndex: 50,
-        borderBottom: `1px solid ${scrolled ? tk.BORDER : "transparent"}`,
-        backgroundColor: scrolled ? tk.NAV_BG : "transparent",
-        backdropFilter: scrolled ? "blur(20px)" : "none",
-        WebkitBackdropFilter: scrolled ? "blur(20px)" : "none",
-        boxShadow: scrolled ? "0 10px 30px -10px rgba(0,0,0,0.08)" : "none",
+        borderBottom: `1px solid ${scrolled || menuOpen ? tk.BORDER : "transparent"}`,
+        backgroundColor: scrolled || menuOpen ? tk.NAV_BG : "transparent",
+        backdropFilter: scrolled || menuOpen ? "blur(20px)" : "none",
+        WebkitBackdropFilter: scrolled || menuOpen ? "blur(20px)" : "none",
+        boxShadow: scrolled || menuOpen ? "0 10px 30px -10px rgba(0,0,0,0.08)" : "none",
         transition: "background-color 0.35s ease, border-color 0.35s ease, backdrop-filter 0.35s ease, -webkit-backdrop-filter 0.35s ease, box-shadow 0.35s ease",
       } as React.CSSProperties}
     >
       <div style={{
         maxWidth: 1200, margin: "0 auto",
-        padding: "0 clamp(20px, 4vw, 48px)",
+        padding: "0 clamp(16px, 4vw, 48px)",
         display: "flex", alignItems: "center",
         justifyContent: "space-between", height: 64,
       }}>
         {/* Logo — favicon.ico */}
-        <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+        <Link
+          href="/"
+          onClick={() => setMenuOpen(false)}
+          style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}
+        >
           <div style={{
             width: 32, height: 32, borderRadius: 8,
             overflow: "hidden", flexShrink: 0,
@@ -235,35 +241,176 @@ function Navbar() {
           <span style={{ fontWeight: 700, fontSize: "1rem", color: tk.TEXT_HI, letterSpacing: "-0.02em" }}>
             Nexus Forge
           </span>
-        </a>
+        </Link>
 
-        {/* Links + toggle + CTA */}
-        <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-          {links.map(l => (
-            <NavLink
-              key={l}
-              href={l === "Contact" ? "/start-project" : `#${l.toLowerCase()}`}
-              label={l}
-            />
-          ))}
+        {/* Right side container */}
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          {/* Desktop links */}
+          <div className="desktop-only" style={{ display: "flex", alignItems: "center", gap: 28, marginRight: 8 }}>
+            {links.map(l => (
+              <NavLink
+                key={l}
+                href={l === "Contact" ? "/start-project" : `#${l.toLowerCase()}`}
+                label={l}
+              />
+            ))}
+          </div>
+
+          {/* Theme Toggle (both mobile & desktop) */}
           <ThemeToggle />
-          <motion.a
+
+          {/* Desktop CTA */}
+          <Link
             href="/start-project"
-            whileHover={{ scale: 1.04, boxShadow: `0 6px 24px -4px ${tk.ACCENT}88` }}
-            whileTap={{ scale: 0.97 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            className="desktop-only"
             style={{
               backgroundColor: tk.ACCENT, color: "#fff",
               padding: "8px 18px", borderRadius: 8,
               fontSize: "0.85rem", fontWeight: 600,
               textDecoration: "none", letterSpacing: "-0.01em",
               display: "inline-block",
+              boxShadow: `0 4px 16px -2px ${tk.ACCENT}66`,
+              transition: "transform 0.15s ease, opacity 0.15s ease",
             }}
           >
             Start a Project
-          </motion.a>
+          </Link>
+
+          {/* Mobile Hamburger Button */}
+          <button
+            type="button"
+            className="mobile-only"
+            onClick={() => setMenuOpen(prev => !prev)}
+            aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 10,
+              border: `1px solid ${tk.BORDER}`,
+              backgroundColor: menuOpen ? tk.ACCENT_DIM : "transparent",
+              color: tk.TEXT_HI,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 5,
+              cursor: "pointer",
+              padding: 0,
+              transition: "background-color 0.2s ease, border-color 0.2s ease",
+            }}
+          >
+            <span
+              style={{
+                width: 20,
+                height: 2,
+                backgroundColor: tk.TEXT_HI,
+                borderRadius: 2,
+                transform: menuOpen ? "rotate(45deg) translate(5px, 5px)" : "none",
+                transition: "transform 0.25s ease",
+              }}
+            />
+            <span
+              style={{
+                width: 20,
+                height: 2,
+                backgroundColor: tk.TEXT_HI,
+                borderRadius: 2,
+                opacity: menuOpen ? 0 : 1,
+                transition: "opacity 0.2s ease",
+              }}
+            />
+            <span
+              style={{
+                width: 20,
+                height: 2,
+                backgroundColor: tk.TEXT_HI,
+                borderRadius: 2,
+                transform: menuOpen ? "rotate(-45deg) translate(5px, -5px)" : "none",
+                transition: "transform 0.25s ease",
+              }}
+            />
+          </button>
         </div>
       </div>
+
+      {/* Mobile Drawer */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            style={{
+              overflow: "hidden",
+              backgroundColor: tk.SURFACE,
+              borderBottom: `1px solid ${tk.BORDER}`,
+              boxShadow: "0 24px 48px -12px rgba(0,0,0,0.2)",
+            }}
+          >
+            <div style={{
+              padding: "16px clamp(16px, 4vw, 32px) 24px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+            }}>
+              {links.map((l) => (
+                <a
+                  key={l}
+                  href={l === "Contact" ? "/start-project" : `#${l.toLowerCase()}`}
+                  onClick={() => setMenuOpen(false)}
+                  style={{
+                    color: tk.TEXT_HI,
+                    textDecoration: "none",
+                    fontSize: "1.05rem",
+                    fontWeight: 600,
+                    padding: "10px 0",
+                    borderBottom: `1px solid ${tk.BORDER_LT}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <span>{l}</span>
+                  <span style={{ color: tk.TEXT_LO, fontSize: "0.85rem" }}>→</span>
+                </a>
+              ))}
+
+              <div style={{ paddingTop: 8 }}>
+                <Link
+                  href="/start-project"
+                  onClick={() => setMenuOpen(false)}
+                  style={{
+                    backgroundColor: tk.ACCENT,
+                    color: "#fff",
+                    padding: "14px 20px",
+                    borderRadius: 10,
+                    fontSize: "0.95rem",
+                    fontWeight: 700,
+                    textDecoration: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                    boxShadow: `0 4px 16px ${tk.ACCENT}40`,
+                    minHeight: 44,
+                  }}
+                >
+                  Start a Project →
+                </Link>
+              </div>
+
+              {/* Social icons in drawer */}
+              <div style={{ display: "flex", gap: 12, justifyContent: "center", paddingTop: 10 }}>
+                {SOCIALS.map((s) => (
+                  <SocialIcon key={s.label} social={s} />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 }
@@ -332,10 +479,10 @@ function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           style={{
-            fontSize: "clamp(3rem, 7vw, 6.2rem)",
-            fontWeight: 900, lineHeight: 1.05,
+            fontSize: "clamp(2.4rem, 7.5vw, 5.8rem)",
+            fontWeight: 900, lineHeight: 1.08,
             letterSpacing: "-0.045em", color: tk.TEXT_HI,
-            maxWidth: "16ch", marginBottom: 24,
+            maxWidth: "16ch", marginBottom: 20,
           }}
         >
           Build.{" "}
@@ -355,9 +502,9 @@ function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
           style={{
-            fontSize: "clamp(1rem, 1.4vw, 1.2rem)",
+            fontSize: "clamp(0.95rem, 3.5vw, 1.15rem)",
             color: tk.TEXT_MED, lineHeight: 1.7,
-            maxWidth: "52ch", marginBottom: 36,
+            maxWidth: "52ch", marginBottom: 32,
           }}
         >
           Nexus Forge is a full-service digital agency crafting intelligent web products,
@@ -366,12 +513,14 @@ function Hero() {
 
         {/* CTAs */}
         <motion.div
+          className="hero-buttons-container"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.48 }}
-          style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}
+          style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}
         >
           <motion.a
+            className="hero-btn"
             href="/start-project"
             whileHover={{ scale: 1.04, boxShadow: `0 10px 48px -8px ${tk.ACCENT}BB` }}
             whileTap={{ scale: 0.97 }}
@@ -383,11 +532,13 @@ function Hero() {
               fontSize: "0.95rem", fontWeight: 700, textDecoration: "none",
               letterSpacing: "-0.01em",
               boxShadow: `0 0 40px -8px ${tk.ACCENT}66`,
+              minHeight: 48,
             }}
           >
             Start a Project <span>→</span>
           </motion.a>
           <motion.a
+            className="hero-btn"
             href="#work"
             whileHover={{ borderColor: tk.BORDER_LT, color: tk.TEXT_HI, scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
@@ -397,6 +548,7 @@ function Hero() {
               border: `1px solid ${tk.BORDER_LT}`, color: tk.TEXT_MED,
               padding: "14px 28px", borderRadius: 10,
               fontSize: "0.95rem", fontWeight: 600, textDecoration: "none",
+              minHeight: 48,
             }}
           >
             See Our Work
@@ -560,7 +712,7 @@ function Services() {
           Everything you need to scale your business
         </h2>
       </FadeIn>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: 20 }}>
         {SERVICES.map((s, i) => <ServiceCard key={i} service={s} i={i} />)}
       </div>
     </section>
@@ -582,6 +734,7 @@ function ProcessRow({ step, i, last }: { step: typeof STEPS[0]; i: number; last:
   const [hov, setHov] = useState(false);
   return (
     <motion.div
+      className="process-row-grid"
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       animate={{ backgroundColor: hov ? tk.SURFACE_HOVER : "rgba(0,0,0,0)" }}
@@ -609,7 +762,7 @@ function ProcessRow({ step, i, last }: { step: typeof STEPS[0]; i: number; last:
       >
         {step.n}
       </motion.div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "clamp(16px, 3vw, 48px)", alignItems: "start" }}>
+      <div className="process-inner-grid" style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "clamp(16px, 3vw, 48px)", alignItems: "start" }}>
         <motion.h3
           animate={{ color: hov ? tk.ACCENT : tk.TEXT_HI }}
           transition={{ duration: 0.2 }}
@@ -737,7 +890,7 @@ function Testimonials() {
             What our clients say
           </h2>
         </FadeIn>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 20 }}>
           {TESTIMONIALS.map((t, i) => <TestimonialCard key={i} t={t} i={i} />)}
         </div>
       </div>
@@ -803,8 +956,9 @@ function CTA() {
               No sales pitches — just an honest conversation.
             </p>
 
-            <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+            <div className="cta-buttons-container" style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
               <motion.a
+                className="cta-btn"
                 href="/start-project"
                 whileHover={{ scale: 1.05, boxShadow: `0 10px 56px -8px ${tk.ACCENT}BB` }}
                 whileTap={{ scale: 0.97 }}
@@ -816,11 +970,13 @@ function CTA() {
                   fontSize: "1rem", fontWeight: 700, textDecoration: "none",
                   letterSpacing: "-0.01em",
                   boxShadow: `0 0 40px -8px ${tk.ACCENT}66`,
+                  minHeight: 48,
                 }}
               >
                 Start a Project →
               </motion.a>
               <motion.a
+                className="cta-btn"
                 href="https://wa.me/919709381728"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -832,6 +988,7 @@ function CTA() {
                   border: `1px solid ${tk.BORDER_LT}`, color: tk.TEXT_MED,
                   padding: "16px 32px", borderRadius: 10,
                   fontSize: "1rem", fontWeight: 600, textDecoration: "none",
+                  minHeight: 48,
                 }}
               >
                 WhatsApp
@@ -932,12 +1089,15 @@ function Footer() {
       maxWidth: 1200, margin: "0 auto",
     }}>
       {/* Social row */}
-      <div style={{
-        padding: "clamp(28px, 3vw, 40px) clamp(20px, 4vw, 48px)",
-        borderBottom: `1px solid ${tk.BORDER}`,
-        display: "flex", alignItems: "center",
-        justifyContent: "space-between", gap: 20, flexWrap: "wrap",
-      }}>
+      <div
+        className="footer-social-row"
+        style={{
+          padding: "clamp(24px, 3vw, 40px) clamp(20px, 4vw, 48px)",
+          borderBottom: `1px solid ${tk.BORDER}`,
+          display: "flex", alignItems: "center",
+          justifyContent: "space-between", gap: 16, flexWrap: "wrap",
+        }}
+      >
         <span style={{ fontSize: "0.82rem", color: tk.TEXT_LO, letterSpacing: "0.01em" }}>
           Follow us for updates & behind-the-scenes
         </span>
@@ -947,11 +1107,14 @@ function Footer() {
       </div>
 
       {/* Bottom row */}
-      <div style={{
-        padding: "clamp(20px, 2.5vw, 32px) clamp(20px, 4vw, 48px)",
-        display: "flex", justifyContent: "space-between",
-        alignItems: "center", gap: 20, flexWrap: "wrap",
-      }}>
+      <div
+        className="footer-bottom-row"
+        style={{
+          padding: "clamp(20px, 2.5vw, 32px) clamp(20px, 4vw, 48px)",
+          display: "flex", justifyContent: "space-between",
+          alignItems: "center", gap: 16, flexWrap: "wrap",
+        }}
+      >
         {/* Brand */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 24, height: 24, borderRadius: 6, overflow: "hidden", flexShrink: 0 }}>
