@@ -1,33 +1,23 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
 import "./globals.css";
 
-const display = Bricolage_Grotesque({
-  subsets: ["latin"],
-  variable: "--font-display",
-  weight: ["600", "800"],
-});
-const body = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-body",
-});
-
 export const metadata: Metadata = {
-  title: "Nexus Forge | Coming soon",
+  metadataBase: new URL("https://nexusforgeagency.in"),
+  title: "Nexus Forge | Digital Agency — Web, Automation & Media",
   description:
-    "Nexus Forge builds websites, automations and media marketing at fair prices. Launching soon.",
-  icons: { icon: "/logo.jpg" },
+    "Nexus Forge builds high-performance websites, intelligent automations, and media marketing campaigns that scale modern businesses.",
+  icons: { icon: "/logo.jpeg" },
   openGraph: {
-    title: "Nexus Forge | Coming soon",
+    title: "Nexus Forge | Digital Agency",
     description:
-      "Websites, automations and media marketing at fair prices. Launching soon.",
-    images: ["/banner.jpg"],
+      "Websites, automations, and media marketing forged for modern growth.",
+    images: ["/banner.jpeg"],
   },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`}>
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body>{children}</body>
     </html>
   );
