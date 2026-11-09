@@ -72,32 +72,95 @@ function useTheme() { return useContext(ThemeContext); }
 function ThemeToggle() {
   const { isDark, toggle, tk } = useTheme();
   const [hov, setHov] = useState(false);
+
   return (
-    <button
+    <motion.button
       onClick={toggle}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.94 }}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
       style={{
-        width: 40, height: 40, borderRadius: 10,
+        width: 40,
+        height: 40,
+        borderRadius: 10,
         border: `1px solid ${hov ? tk.ACCENT_MED : tk.BORDER}`,
         backgroundColor: hov ? tk.ACCENT_DIM : "transparent",
+        color: hov ? tk.ACCENT : tk.TEXT_MED,
         cursor: "pointer",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        transition: "background-color 0.2s, border-color 0.2s",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        transition: "background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease",
+        boxShadow: hov
+          ? (isDark
+              ? "0 0 16px -2px rgba(99, 102, 241, 0.35)"
+              : "0 4px 12px -2px rgba(99, 102, 241, 0.2)")
+          : "none",
         flexShrink: 0,
       }}
     >
-      <motion.span
-        key={isDark ? "sun" : "moon"}
-        initial={{ rotate: -40, opacity: 0, scale: 0.6 }}
-        animate={{ rotate: 0, opacity: 1, scale: 1 }}
-        transition={{ duration: 0.25, ease: "easeOut" }}
-        style={{ display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem" }}
-      >
-        {isDark ? "☀️" : "🌙"}
-      </motion.span>
-    </button>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={isDark ? "sun" : "moon"}
+          initial={{ rotate: -40, opacity: 0, scale: 0.6 }}
+          animate={{ rotate: 0, opacity: 1, scale: 1 }}
+          exit={{ rotate: 40, opacity: 0, scale: 0.6 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          whileHover={{
+            rotate: isDark ? 20 : -15,
+            scale: 1.1,
+            transition: { duration: 0.15 }
+          }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            lineHeight: 0,
+          }}
+        >
+          {isDark ? (
+            /* Minimalist Sun SVG */
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2" />
+              <path d="M12 20v2" />
+              <path d="m4.93 4.93 1.41 1.41" />
+              <path d="m17.66 17.66 1.41 1.41" />
+              <path d="M2 12h2" />
+              <path d="M20 12h2" />
+              <path d="m6.34 17.66-1.41 1.41" />
+              <path d="m19.07 4.93-1.41 1.41" />
+            </svg>
+          ) : (
+            /* Minimalist Moon SVG */
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+            </svg>
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </motion.button>
   );
 }
 
