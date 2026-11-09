@@ -62,7 +62,6 @@ export default function StartProjectPage() {
         description: "",
       });
     } catch (err: any) {
-      console.error(err);
       setStatus("error");
       setErrorMessage(err.message || "An unexpected error occurred. Please try again.");
     }

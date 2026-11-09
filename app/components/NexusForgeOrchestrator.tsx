@@ -4,11 +4,12 @@ import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useState, useRef, createContext, useContext, useCallback, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { PublishedContent, getPublishedContent } from "@/lib/cms";
 
 /* ─────────────────────────────────────────────────────────────
    Theme Tokens
 ───────────────────────────────────────────────────────────── */
-interface Tokens {
+export interface Tokens {
   BG: string;
   SURFACE: string;
   SURFACE_HOVER: string;
@@ -25,7 +26,7 @@ interface Tokens {
   NAV_BG: string;
 }
 
-const dark: Tokens = {
+export const dark: Tokens = {
   BG: "#0A0A0B",
   SURFACE: "#111113",
   SURFACE_HOVER: "#141416",
@@ -42,7 +43,7 @@ const dark: Tokens = {
   NAV_BG: "#0A0A0BCC",
 };
 
-const light: Tokens = {
+export const light: Tokens = {
   BG: "#FAFAFA",
   SURFACE: "#FFFFFF",
   SURFACE_HOVER: "#F4F4F8",
@@ -62,9 +63,21 @@ const light: Tokens = {
 /* ─────────────────────────────────────────────────────────────
    Theme Context
 ───────────────────────────────────────────────────────────── */
-interface ThemeCtx { tk: Tokens; isDark: boolean; toggle: () => void; }
-const ThemeContext = createContext<ThemeCtx>({ tk: light, isDark: false, toggle: () => { } });
-function useTheme() { return useContext(ThemeContext); }
+export interface ThemeCtx { tk: Tokens; isDark: boolean; toggle: () => void; }
+export const ThemeContext = createContext<ThemeCtx>({ tk: light, isDark: false, toggle: () => { } });
+export function useTheme() { return useContext(ThemeContext); }
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [isDark, setIsDark] = useState(false);
+  const toggle = useCallback(() => setIsDark(d => !d), []);
+  const tk = isDark ? dark : light;
+
+  return (
+    <ThemeContext.Provider value={{ tk, isDark, toggle }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
 
 /* ─────────────────────────────────────────────────────────────
    Theme Toggle
@@ -167,7 +180,7 @@ function ThemeToggle() {
 /* ─────────────────────────────────────────────────────────────
    FadeIn scroll helper
 ───────────────────────────────────────────────────────────── */
-function FadeIn({ children, delay = 0, style }: {
+export function FadeIn({ children, delay = 0, style }: {
   children: React.ReactNode;
   delay?: number;
   style?: React.CSSProperties;
@@ -190,7 +203,7 @@ function FadeIn({ children, delay = 0, style }: {
 /* ─────────────────────────────────────────────────────────────
    Section divider label
 ───────────────────────────────────────────────────────────── */
-function SectionLabel({ label }: { label: string }) {
+export function SectionLabel({ label }: { label: string }) {
   const { tk } = useTheme();
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
@@ -206,11 +219,19 @@ function SectionLabel({ label }: { label: string }) {
 /* ─────────────────────────────────────────────────────────────
    Navbar
 ───────────────────────────────────────────────────────────── */
-function NavLink({ href, label }: { href: string; label: string }) {
+export const NAV_LINKS = [
+  { label: "Services", href: "/#services" },
+  { label: "Work", href: "/work" },
+  { label: "Blog", href: "/blog" },
+  { label: "About", href: "/#about" },
+  { label: "Contact", href: "/start-project" },
+];
+
+export function NavLink({ href, label }: { href: string; label: string }) {
   const { tk } = useTheme();
   const [hov, setHov] = useState(false);
   return (
-    <a
+    <Link
       href={href}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
@@ -236,13 +257,12 @@ function NavLink({ href, label }: { href: string; label: string }) {
           transformOrigin: "left",
         }}
       />
-    </a>
+    </Link>
   );
 }
 
-function Navbar() {
+export function Navbar() {
   const { tk } = useTheme();
-  const links = ["Services", "Work", "About", "Contact"];
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -310,11 +330,11 @@ function Navbar() {
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           {/* Desktop links */}
           <div className="desktop-only" style={{ display: "flex", alignItems: "center", gap: 28, marginRight: 8 }}>
-            {links.map(l => (
+            {NAV_LINKS.map(l => (
               <NavLink
-                key={l}
-                href={l === "Contact" ? "/start-project" : `#${l.toLowerCase()}`}
-                label={l}
+                key={l.label}
+                href={l.href}
+                label={l.label}
               />
             ))}
           </div>
@@ -418,10 +438,10 @@ function Navbar() {
               flexDirection: "column",
               gap: 12,
             }}>
-              {links.map((l) => (
-                <a
-                  key={l}
-                  href={l === "Contact" ? "/start-project" : `#${l.toLowerCase()}`}
+              {NAV_LINKS.map((l) => (
+                <Link
+                  key={l.label}
+                  href={l.href}
                   onClick={() => setMenuOpen(false)}
                   style={{
                     color: tk.TEXT_HI,
@@ -435,9 +455,9 @@ function Navbar() {
                     justifyContent: "space-between",
                   }}
                 >
-                  <span>{l}</span>
+                  <span>{l.label}</span>
                   <span style={{ color: tk.TEXT_LO, fontSize: "0.85rem" }}>→</span>
-                </a>
+                </Link>
               ))}
 
               <div style={{ paddingTop: 8 }}>
@@ -602,7 +622,7 @@ function Hero() {
           </motion.a>
           <motion.a
             className="hero-btn"
-            href="#work"
+            href="/work"
             whileHover={{ borderColor: tk.BORDER_LT, color: tk.TEXT_HI, scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}
@@ -614,7 +634,7 @@ function Hero() {
               minHeight: 48,
             }}
           >
-            See Our Work
+            See Our Work <span>→</span>
           </motion.a>
         </motion.div>
       </div>
@@ -783,6 +803,388 @@ function Services() {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   Work & Case Studies (Supabase CMS Integration)
+───────────────────────────────────────────────────────────── */
+export function WorkCard({ item, i }: { item: PublishedContent; i: number }) {
+  const { tk } = useTheme();
+  const [hov, setHov] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+
+  const typeLabels: Record<string, string> = {
+    case_study: "Case Study",
+    portfolio: "Portfolio",
+    blog: "Article",
+    landing_copy: "Featured",
+  };
+
+  const formattedDate = item.published_at
+    ? new Date(item.published_at).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "Recent";
+
+  const targetUrl = item.type === "blog" ? `/blog/${item.slug}` : `/work/${item.slug}`;
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 32 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{
+        duration: 0.6,
+        delay: i * 0.12,
+        ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+      }}
+      whileHover={{
+        y: -8,
+        boxShadow: `${tk.SHADOW_CARD}, 0 0 0 1px ${tk.ACCENT}44`,
+      }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        backgroundColor: tk.SURFACE,
+        border: `1px solid ${hov ? tk.ACCENT + "55" : tk.BORDER}`,
+        borderRadius: 16,
+        padding: "clamp(24px, 3.5vw, 36px)",
+        cursor: "default",
+        transition: "border-color 0.3s, background-color 0.3s",
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Corner accent glow on hover */}
+      <motion.div
+        animate={{ opacity: hov ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+        style={{
+          position: "absolute",
+          top: -40,
+          right: -40,
+          width: 140,
+          height: 140,
+          borderRadius: "50%",
+          background: `radial-gradient(circle, ${tk.ACCENT}22 0%, transparent 70%)`,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Top Meta Row */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 18,
+          gap: 12,
+        }}
+      >
+        <span
+          style={{
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: tk.ACCENT,
+            backgroundColor: tk.ACCENT_DIM,
+            border: `1px solid ${tk.ACCENT_MED}`,
+            padding: "4px 10px",
+            borderRadius: 999,
+          }}
+        >
+          {typeLabels[item.type] || item.type}
+        </span>
+        <div
+          style={{
+            fontSize: "0.75rem",
+            color: tk.TEXT_LO,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <span>{formattedDate}</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+            <span>•</span>
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ display: "inline-block", flexShrink: 0, opacity: 0.8 }}
+              aria-hidden="true"
+            >
+              <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            <span>{(item.views_count || 0).toLocaleString()} {(item.views_count || 0) === 1 ? "view" : "views"}</span>
+          </span>
+        </div>
+      </div>
+
+      {/* Title */}
+      <h3
+        style={{
+          fontSize: "clamp(1.2rem, 1.8vw, 1.45rem)",
+          fontWeight: 800,
+          color: tk.TEXT_HI,
+          letterSpacing: "-0.03em",
+          marginBottom: 12,
+          lineHeight: 1.3,
+        }}
+      >
+        {item.title}
+      </h3>
+
+      {/* Summary */}
+      {item.summary && (
+        <p
+          style={{
+            fontSize: "0.9rem",
+            color: tk.TEXT_MED,
+            lineHeight: 1.7,
+            marginBottom: 24,
+            flexGrow: 1,
+          }}
+        >
+          {item.summary}
+        </p>
+      )}
+
+      {/* Author and Action */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingTop: 16,
+          borderTop: `1px solid ${tk.BORDER_LT}`,
+          marginTop: "auto",
+        }}
+      >
+        <span style={{ fontSize: "0.78rem", color: tk.TEXT_LO }}>
+          By{" "}
+          <strong style={{ color: tk.TEXT_MED, fontWeight: 600 }}>
+            {item.author_name}
+          </strong>
+        </span>
+        <Link
+          href={targetUrl}
+          style={{
+            fontSize: "0.84rem",
+            fontWeight: 700,
+            color: tk.ACCENT,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            textDecoration: "none",
+          }}
+        >
+          <span>{item.type === "blog" ? "Read Article" : "View Case Study"}</span>
+          <motion.span
+            animate={{ x: hov ? 4 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            →
+          </motion.span>
+        </Link>
+      </div>
+    </motion.div>
+  );
+}
+
+export function WorkSection({ items = [] }: { items?: PublishedContent[] }) {
+  const { tk } = useTheme();
+  const [activeFilter, setActiveFilter] = useState<string>("all");
+
+  const filteredItems = items.filter((item) => {
+    if (activeFilter === "all") return true;
+    if (activeFilter === "case_study") return item.type === "case_study";
+    if (activeFilter === "portfolio") return item.type === "portfolio";
+    if (activeFilter === "blog") return item.type === "blog";
+    return true;
+  });
+
+  const filterTabs = [
+    { id: "all", label: "All Items" },
+    { id: "case_study", label: "Case Studies" },
+    { id: "portfolio", label: "Portfolio" },
+  ];
+
+  return (
+    <section
+      id="work"
+      style={{
+        padding: "clamp(60px, 8vw, 100px) 0 clamp(80px, 10vw, 120px)",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 1200,
+          margin: "0 auto",
+          padding: "0 clamp(20px, 4vw, 48px)",
+        }}
+      >
+        <FadeIn style={{ marginBottom: 40 }}>
+          <div>
+            <SectionLabel label="Selected Work & Case Studies" />
+            <h1
+              style={{
+                fontSize: "clamp(2.4rem, 5vw, 4rem)",
+                fontWeight: 900,
+                color: tk.TEXT_HI,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
+                maxWidth: "20ch",
+                marginBottom: 16,
+              }}
+            >
+              Proven results, engineered for growth
+            </h1>
+            <p
+              style={{
+                fontSize: "clamp(1rem, 2vw, 1.15rem)",
+                color: tk.TEXT_MED,
+                maxWidth: "60ch",
+                lineHeight: 1.7,
+              }}
+            >
+              A showcase of client partnerships, platform migrations, high-throughput
+              automations, and modern web architectures deployed by Nexus Forge.
+            </p>
+          </div>
+        </FadeIn>
+
+        {/* Filter Tabs if multiple items */}
+        {items.length > 0 && (
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              marginBottom: 32,
+              flexWrap: "wrap",
+            }}
+          >
+            {filterTabs.map((tab) => {
+              const active = activeFilter === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveFilter(tab.id)}
+                  style={{
+                    padding: "7px 16px",
+                    borderRadius: 999,
+                    fontSize: "0.82rem",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    border: `1px solid ${active ? tk.ACCENT : tk.BORDER}`,
+                    backgroundColor: active ? tk.ACCENT : tk.SURFACE,
+                    color: active ? "#ffffff" : tk.TEXT_MED,
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Grid or Empty State — NO sample/dummy data */}
+        {filteredItems.length > 0 ? (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns:
+                "repeat(auto-fit, minmax(min(100%, 340px), 1fr))",
+              gap: 24,
+            }}
+          >
+            {filteredItems.map((item, i) => (
+              <WorkCard key={item.id} item={item} i={i} />
+            ))}
+          </div>
+        ) : (
+          <div
+            style={{
+              backgroundColor: tk.SURFACE,
+              border: `1px solid ${tk.BORDER}`,
+              borderRadius: 20,
+              padding: "clamp(48px, 6vw, 80px) 24px",
+              textAlign: "center",
+              maxWidth: 600,
+              margin: "40px auto 0",
+            }}
+          >
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: "50%",
+                backgroundColor: tk.ACCENT_DIM,
+                color: tk.ACCENT,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "0 auto 20px",
+                fontSize: "1.2rem",
+              }}
+            >
+              ✦
+            </div>
+            <h3
+              style={{
+                fontSize: "1.4rem",
+                fontWeight: 800,
+                color: tk.TEXT_HI,
+                marginBottom: 10,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              No case studies published yet
+            </h3>
+            <p
+              style={{
+                fontSize: "0.95rem",
+                color: tk.TEXT_MED,
+                lineHeight: 1.6,
+                marginBottom: 24,
+              }}
+            >
+              We are finalizing documentation for our latest enterprise client deployments.
+              Check back soon, or connect with our team today.
+            </p>
+            <Link
+              href="/start-project"
+              style={{
+                display: "inline-block",
+                backgroundColor: tk.ACCENT,
+                color: "#fff",
+                padding: "12px 24px",
+                borderRadius: 10,
+                fontSize: "0.9rem",
+                fontWeight: 700,
+                textDecoration: "none",
+              }}
+            >
+              Start a Project →
+            </Link>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
    Process
 ───────────────────────────────────────────────────────────── */
 const STEPS = [
@@ -849,7 +1251,7 @@ function ProcessRow({ step, i, last }: { step: typeof STEPS[0]; i: number; last:
 function Process() {
   const { tk } = useTheme();
   return (
-    <section id="work" style={{
+    <section id="process" style={{
       borderTop: `1px solid ${tk.BORDER}`,
       padding: "clamp(80px, 10vw, 120px) 0",
     }}>
@@ -1144,26 +1546,40 @@ function SocialIcon({ social }: { social: typeof SOCIALS[0] }) {
 /* ─────────────────────────────────────────────────────────────
    Footer
 ───────────────────────────────────────────────────────────── */
-function Footer() {
+export function Footer() {
   const { tk } = useTheme();
   return (
     <footer style={{
       borderTop: `1px solid ${tk.BORDER}`,
       maxWidth: 1200, margin: "0 auto",
     }}>
-      {/* Social row */}
+      {/* Navigation & Social row */}
       <div
         className="footer-social-row"
         style={{
           padding: "clamp(24px, 3vw, 40px) clamp(20px, 4vw, 48px)",
           borderBottom: `1px solid ${tk.BORDER}`,
           display: "flex", alignItems: "center",
-          justifyContent: "space-between", gap: 16, flexWrap: "wrap",
+          justifyContent: "space-between", gap: 20, flexWrap: "wrap",
         }}
       >
-        <span style={{ fontSize: "0.82rem", color: tk.TEXT_LO, letterSpacing: "0.01em" }}>
-          Follow us for updates & behind-the-scenes
-        </span>
+        <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.label}
+              href={link.href}
+              style={{
+                color: tk.TEXT_MED,
+                fontSize: "0.85rem",
+                textDecoration: "none",
+                fontWeight: 500,
+                transition: "color 0.15s ease",
+              }}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
         <div style={{ display: "flex", gap: 10 }}>
           {SOCIALS.map(s => <SocialIcon key={s.label} social={s} />)}
         </div>
@@ -1188,16 +1604,14 @@ function Footer() {
 
         {/* Legal links */}
         <div style={{ display: "flex", gap: 24 }}>
-          {[["Privacy", "#"], ["Terms", "#"]].map(([label, href]) => (
-            <motion.a
+          {[["Privacy", "/privacy"], ["Terms", "/terms"]].map(([label, href]) => (
+            <Link
               key={label}
               href={href}
-              whileHover={{ color: tk.ACCENT }}
-              transition={{ duration: 0.15 }}
-              style={{ color: tk.TEXT_LO, fontSize: "0.82rem", textDecoration: "none" }}
+              style={{ color: tk.TEXT_LO, fontSize: "0.82rem", textDecoration: "none", transition: "color 0.15s ease" }}
             >
               {label}
-            </motion.a>
+            </Link>
           ))}
         </div>
       </div>
@@ -1208,7 +1622,7 @@ function Footer() {
 /* ─────────────────────────────────────────────────────────────
    Landing Page
 ───────────────────────────────────────────────────────────── */
-function LandingPage() {
+function LandingPage({ featuredWork = [] }: { featuredWork?: PublishedContent[] }) {
   const { tk } = useTheme();
   return (
     <motion.div
@@ -1219,6 +1633,87 @@ function LandingPage() {
       <Navbar />
       <Hero />
       <Services />
+
+      {/* Live Featured Case Studies (rendered only if published items exist in Supabase) */}
+      {featuredWork.length > 0 && (
+        <section
+          id="work"
+          style={{
+            padding: "clamp(60px, 8vw, 100px) 0",
+            borderTop: `1px solid ${tk.BORDER}`,
+            backgroundColor: tk.SURFACE_HOVER,
+          }}
+        >
+          <div
+            style={{
+              maxWidth: 1200,
+              margin: "0 auto",
+              padding: "0 clamp(20px, 4vw, 48px)",
+            }}
+          >
+            <FadeIn style={{ marginBottom: 40 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-end",
+                  flexWrap: "wrap",
+                  gap: 16,
+                }}
+              >
+                <div>
+                  <SectionLabel label="Selected Work & Case Studies" />
+                  <h2
+                    style={{
+                      fontSize: "clamp(2rem, 4vw, 3.2rem)",
+                      fontWeight: 900,
+                      color: tk.TEXT_HI,
+                      letterSpacing: "-0.04em",
+                      lineHeight: 1.1,
+                      maxWidth: "22ch",
+                    }}
+                  >
+                    Engineered for growth & scale
+                  </h2>
+                </div>
+                <Link
+                  href="/work"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    fontSize: "0.88rem",
+                    fontWeight: 700,
+                    color: tk.ACCENT,
+                    textDecoration: "none",
+                    padding: "8px 18px",
+                    borderRadius: 8,
+                    border: `1px solid ${tk.ACCENT_MED}`,
+                    backgroundColor: tk.ACCENT_DIM,
+                  }}
+                >
+                  <span>Explore All Work</span>
+                  <span>→</span>
+                </Link>
+              </div>
+            </FadeIn>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns:
+                  "repeat(auto-fit, minmax(min(100%, 340px), 1fr))",
+                gap: 24,
+              }}
+            >
+              {featuredWork.slice(0, 3).map((item, i) => (
+                <WorkCard key={item.id} item={item} i={i} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       <Process />
       <Testimonials />
       <CTA />
@@ -1231,13 +1726,22 @@ function LandingPage() {
    Root — provides theme context
 ───────────────────────────────────────────────────────────── */
 export default function NexusForgeOrchestrator() {
-  const [isDark, setIsDark] = useState(false);
-  const toggle = useCallback(() => setIsDark(d => !d), []);
-  const tk = isDark ? dark : light;
+  const [featuredWork, setFeaturedWork] = useState<PublishedContent[]>([]);
+
+  useEffect(() => {
+    // Live client-side fetch to Supabase — visible in the browser DevTools Network tab
+    getPublishedContent(["case_study", "portfolio"])
+      .then((data) => {
+        if (data && data.length > 0) {
+          setFeaturedWork(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
-    <ThemeContext.Provider value={{ tk, isDark, toggle }}>
-      <LandingPage />
-    </ThemeContext.Provider>
+    <ThemeProvider>
+      <LandingPage featuredWork={featuredWork} />
+    </ThemeProvider>
   );
 }
