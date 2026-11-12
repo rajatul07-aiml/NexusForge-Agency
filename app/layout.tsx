@@ -9,7 +9,7 @@ export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#FAFAFA" },
     { media: "(prefers-color-scheme: dark)", color: "#0A0A0B" },
-  ],
+  ], 
 };
 
 export const metadata: Metadata = {
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
       {
         url: "/banner.jpeg",
         width: 1200,
-        height: 630,
+        height: 630,  
         alt: "Nexus Forge - Web, Automation & Media Agency",
       },
     ],
