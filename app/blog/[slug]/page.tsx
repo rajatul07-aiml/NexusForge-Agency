@@ -21,20 +21,117 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!item) {
     return {
-      title: "Article | Nexus Forge",
+      title: "Article Not Found",
     };
   }
 
+  const title = item.title;
+  const description = item.summary || "Article by Nexus Forge engineering and product team.";
+  const url = `https://nexusforgeagency.in/blog/${item.slug}`;
+  const image = item.cover_image || "/banner.jpeg";
+
   return {
-    title: `${item.title} | Nexus Forge Blog`,
-    description: item.summary || "Article by Nexus Forge.",
+    title,
+    description,
+    alternates: {
+      canonical: `/blog/${item.slug}`,
+    },
+    openGraph: {
+      title: `${title} | Nexus Forge Blog`,
+      description,
+      url,
+      type: "article",
+      publishedTime: item.published_at || item.updated_at,
+      modifiedTime: item.updated_at,
+      authors: [item.author_name || "Nexus Forge"],
+      images: [
+        {
+          url: image,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} | Nexus Forge Blog`,
+      description,
+      images: [image],
+    },
   };
 }
 
 async function BlogPostContentLoader({ params }: Props) {
   const { slug } = await params;
   const item = await getContentItemBySlug(slug);
-  return <BlogPostClient item={item} />;
+
+  if (!item) {
+    return <BlogPostClient item={null} />;
+  }
+
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: item.title,
+    description: item.summary || item.title,
+    image: item.cover_image || "https://nexusforgeagency.in/banner.jpeg",
+    datePublished: item.published_at || item.updated_at,
+    dateModified: item.updated_at,
+    author: {
+      "@type": "Person",
+      name: item.author_name || "Nexus Forge Team",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Nexus Forge",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://nexusforgeagency.in/logo.jpeg",
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://nexusforgeagency.in/blog/${item.slug}`,
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://nexusforgeagency.in",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: "https://nexusforgeagency.in/blog",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: item.title,
+        item: `https://nexusforgeagency.in/blog/${item.slug}`,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <BlogPostClient item={item} />
+    </>
+  );
 }
 
 export default function BlogPostPage(props: Props) {
