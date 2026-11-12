@@ -64,12 +64,50 @@ export const light: Tokens = {
    Theme Context
 ───────────────────────────────────────────────────────────── */
 export interface ThemeCtx { tk: Tokens; isDark: boolean; toggle: () => void; }
-export const ThemeContext = createContext<ThemeCtx>({ tk: light, isDark: false, toggle: () => { } });
+const DEFAULT_THEME_CTX: ThemeCtx = { tk: light, isDark: false, toggle: () => { } };
+export const ThemeContext = createContext<ThemeCtx>(DEFAULT_THEME_CTX);
 export function useTheme() { return useContext(ThemeContext); }
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [isDark, setIsDark] = useState(false);
-  const toggle = useCallback(() => setIsDark(d => !d), []);
+function RootThemeProvider({ children }: { children: React.ReactNode }) {
+  const [isDark, setIsDark] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Read persisted preference on mount
+    try {
+      const saved = localStorage.getItem("nexusforge_theme");
+      if (saved === "dark") {
+        setIsDark(true);
+      } else if (saved === "light") {
+        setIsDark(false);
+      }
+    } catch {}
+  }, []);
+
+  const toggle = useCallback(() => {
+    setIsDark((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("nexusforge_theme", next ? "dark" : "light");
+        if (typeof document !== "undefined") {
+          document.documentElement.classList.toggle("dark", next);
+          document.documentElement.style.colorScheme = next ? "dark" : "light";
+          document.documentElement.style.backgroundColor = next ? "#0A0A0B" : "#FAFAFA";
+        }
+      } catch {}
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (typeof document !== "undefined") {
+        document.documentElement.classList.toggle("dark", isDark);
+        document.documentElement.style.colorScheme = isDark ? "dark" : "light";
+        document.documentElement.style.backgroundColor = isDark ? "#0A0A0B" : "#FAFAFA";
+      }
+    } catch {}
+  }, [isDark]);
+
   const tk = isDark ? dark : light;
 
   return (
@@ -77,6 +115,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       {children}
     </ThemeContext.Provider>
   );
+}
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const parentCtx = useContext(ThemeContext);
+
+  // If already inside an active ThemeProvider, don't create a nested one — inherit state!
+  if (parentCtx && parentCtx.toggle !== DEFAULT_THEME_CTX.toggle) {
+    return <>{children}</>;
+  }
+
+  return <RootThemeProvider>{children}</RootThemeProvider>;
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -1724,7 +1773,7 @@ function LandingPage({ featuredWork = [] }: { featuredWork?: PublishedContent[] 
 
 /* ─────────────────────────────────────────────────────────────
    Root — provides theme context
-───────────────────────────────────────────────────────────── */
+───── ──────────────────────────────────────────────────────── */
 export default function NexusForgeOrchestrator() {
   const [featuredWork, setFeaturedWork] = useState<PublishedContent[]>([]);
 
